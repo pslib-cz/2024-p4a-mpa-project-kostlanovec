@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.filament.android)
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
+    implementation ("androidx.work:work-runtime-ktx:2.9.1")
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation(libs.androidx.core.ktx)

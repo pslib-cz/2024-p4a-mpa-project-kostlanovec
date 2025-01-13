@@ -11,11 +11,12 @@ class ChangeDetailAdapter(private val changes: List<ChangeDetail>) :
     RecyclerView.Adapter<ChangeDetailAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val typeTextView: TextView = view.findViewById(R.id.typeTextView)
+        val dateTextView: TextView = view.findViewById(R.id.dateTextView)
+        val hourTextView: TextView = view.findViewById(R.id.hourTextView)
+        val classNameTextView: TextView = view.findViewById(R.id.classNameTextView)
         val subjectTextView: TextView = view.findViewById(R.id.subjectTextView)
-        val absentInfoTextView: TextView = view.findViewById(R.id.absentInfoTextView)
-        val infoAbsentNameTextView: TextView = view.findViewById(R.id.infoAbsentNameTextView)
-        val removedInfoTextView: TextView = view.findViewById(R.id.removedInfoTextView)
+        val roomTextView: TextView = view.findViewById(R.id.roomTextView)
+        val changeInfoTextView: TextView = view.findViewById(R.id.changeInfoTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,20 +27,24 @@ class ChangeDetailAdapter(private val changes: List<ChangeDetail>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val change = changes[position]
-        holder.typeTextView.text = "Type: ${change.type}"
-        holder.subjectTextView.text = "Subject: ${change.subjectText}"
-        holder.absentInfoTextView.text = "Absent Info: ${change.absentInfo}"
-        holder.infoAbsentNameTextView.text = "Info Absent Name: ${change.infoAbsentName}"
-        holder.removedInfoTextView.text = "Removed Info: ${change.removedInfo}"
+        holder.dateTextView.text = change.date
+        holder.hourTextView.text = change.hour
+        holder.classNameTextView.text = change.className
+        holder.subjectTextView.text = change.subject
+        holder.roomTextView.text = change.room
+        holder.changeInfoTextView.text = change.changeInfo
     }
 
     override fun getItemCount(): Int = changes.size
 }
 
+// Updated ChangeDetail data class
+
 data class ChangeDetail(
-    val type: String,
-    val subjectText: String,
-    val absentInfo: String,
-    val infoAbsentName: String,
-    val removedInfo: String
+    val date: String,
+    val hour: String,
+    val subject: String,
+    val className: String,
+    val room: String,
+    val changeInfo: String
 )

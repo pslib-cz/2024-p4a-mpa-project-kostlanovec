@@ -20,4 +20,7 @@ interface TeacherDao {
 
     @Query("SELECT * FROM teachers")
     suspend fun getAllTeachers(): List<Teacher>
+
+    @Query("SELECT * FROM teachers WHERE id = :teacherId LIMIT 1")
+    fun getTeacherById(teacherId: String): Teacher?
 }
