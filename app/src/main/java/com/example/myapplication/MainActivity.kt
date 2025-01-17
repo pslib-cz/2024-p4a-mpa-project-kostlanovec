@@ -1,8 +1,10 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ListView
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -28,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var teacherSpinner: Spinner
     private lateinit var saveButton: Button
     private lateinit var updateTeachers: Button
+    private lateinit var timeListView: ListView
+    private lateinit var addTimeButton: Button
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         teacherSpinner = findViewById(R.id.teacherSpinner)
         updateTeachers = findViewById(R.id.button)
         saveButton = findViewById(R.id.button2)
+        timeListView = findViewById(R.id.timeListView)
+        addTimeButton = findViewById(R.id.addTimeButton)
         sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE)
 
         val fromDashboard = intent.getBooleanExtra("from_dashboard", false)
@@ -66,6 +73,30 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        addTimeButton.setOnClickListener {
+            showTimePickerDialog(null)
+        }
+
+        timeListView.setOnItemClickListener { _, _, position, _ ->
+            val times = getSavedTimes()
+            showTimePickerDialog(times[position]) { updatedTime ->
+                val updatedTimes = times.toMutableList()
+                updatedTimes[position] = updatedTime
+                saveTimes(updatedTimes.toSet())
+                updateTimeListView()
+            }
+        }
+
+        timeListView.setOnItemLongClickListener { _, _, position, _ ->
+            val times = getSavedTimes().toMutableList()
+            times.removeAt(position)
+            saveTimes(times.toSet())
+            updateTimeListView()
+            true
+        }
+
+        updateTimeListView()
     }
 
     private fun setupTeachers() {
@@ -120,6 +151,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveSelectedTeacher() {
+        val savedTimes = getSavedTimes()
+
+        if (savedTimes.isEmpty()) {
+            android.widget.Toast.makeText(
+                this,
+                "Nejdříve nastavte alespoň jeden čas na notifikace.",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
         val selectedTeacher = teacherSpinner.selectedItem?.toString()
         if (selectedTeacher != null) {
             val teacherId = selectedTeacher.substringAfter("(").substringBefore(")").trim()
@@ -130,6 +172,7 @@ class MainActivity : AppCompatActivity() {
             navigateToDashboard(teacherId)
         }
     }
+
 
     private fun navigateToDashboard(teacherId: String) {
         val intent = Intent(this, DashboardActivity::class.java)
@@ -176,6 +219,56 @@ class MainActivity : AppCompatActivity() {
         } else {
             NotificationManagerCompat.from(this).notify(1, notification)
         }
+    }
+
+    private fun getSavedTimes(): List<String> {
+        return sharedPreferences.getStringSet("notification_times", emptySet())!!.toList()
+    }
+
+    private fun saveTimes(times: Set<String>) {
+        sharedPreferences.edit()
+            .putStringSet("notification_times", times)
+            .apply()
+    }
+
+    private fun updateTimeListView() {
+        val times = getSavedTimes()
+            .sortedBy { parseTimeToMinutes(it) }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, times)
+        timeListView.adapter = adapter
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun showTimePickerDialog(existingTime: String?, onTimeSelected: ((String) -> Unit)? = null) {
+        val calendar = java.util.Calendar.getInstance()
+        if (existingTime != null) {
+            val parts = existingTime.split(":")
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, parts[0].toInt())
+            calendar.set(java.util.Calendar.MINUTE, parts[1].toInt())
+        }
+
+        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(java.util.Calendar.MINUTE)
+
+        val timePickerDialog = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
+            val formattedTime = String.format("%02d:%02d", selectedHour, selectedMinute)
+            val times = getSavedTimes().toMutableSet()
+
+            if (onTimeSelected != null) {
+                onTimeSelected(formattedTime)
+            } else {
+                times.add(formattedTime)
+                saveTimes(times)
+                updateTimeListView()
+            }
+        }, hour, minute, true)
+
+        timePickerDialog.show()
+    }
+
+    private fun parseTimeToMinutes(time: String): Int {
+        val (hours, minutes) = time.split(":").map { it.toInt() }
+        return hours * 60 + minutes
     }
 
     override fun onRequestPermissionsResult(

@@ -32,15 +32,14 @@
 
     <TableLayout
         android:layout_width="427dp"
-        android:layout_height="783dp"
+        android:layout_height="0dp"
         android:background="#555555"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/teacherNameTextView"
-        app:layout_constraintVertical_bias="0.153">
+        app:layout_constraintBottom_toTopOf="@+id/currentWeekButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside">
 
         <TableRow
             android:layout_width="match_parent"
@@ -107,7 +106,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
         </TableRow>
-        <!-- RecyclerView pro dynamický obsah -->
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="433dp"
@@ -119,8 +118,8 @@
         android:id="@+id/currentWeekButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:text="Aktuální týden"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -129,8 +128,8 @@
         android:id="@+id/nextWeekButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:text="Příští týden"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

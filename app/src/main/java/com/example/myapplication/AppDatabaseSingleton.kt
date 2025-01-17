@@ -16,15 +16,13 @@ class AppDatabaseSingleton private constructor() {
         private var INSTANCE: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase {
-            // Pokud instance již existuje, vrátíme ji
             return INSTANCE ?: synchronized(this) {
-                // Vytvoření nové instance, pokud neexistuje
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "app_database" // Název databáze
+                    "app_database"
                 )
-                    .fallbackToDestructiveMigration() // Zničí starou databázi při změně schématu, pokud nejsou migrace
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
@@ -35,7 +33,7 @@ class AppDatabaseSingleton private constructor() {
 
 @Database(
     entities = [Teacher::class, ScheduleChange::class],
-    version = 1
+    version = 2
 )
 
 abstract class AppDatabase : RoomDatabase() {
